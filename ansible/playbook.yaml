@@ -1,0 +1,8 @@
+- hosts: all
+  become: true
+  roles:
+    - base
+    - nginx
+    - users
+    - zsh_setup
+    - ssh_config

@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  ansible:
+    build: ./
+    container_name: ansible
+    ports:
+      - "3322:22"
+      - "8080:80"
+    restart: always

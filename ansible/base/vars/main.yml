@@ -1,0 +1,13 @@
+---
+pacages:
+  - curl
+  - nano
+  - wget
+  - htop
+  - ncdu
+  - git
+  - unzip
+  - bzip2
+  - xz-utils
+  - gzip
+  - zstd

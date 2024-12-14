@@ -1,0 +1,14 @@
+---
+- name: update apt
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: true
+
+- name: Update all packages to the latest version
+  ansible.builtin.apt:
+    upgrade: dist
+
+- name: install packages
+  ansible.builtin.apt:
+    name: "{{pacages}}"
+    state: present

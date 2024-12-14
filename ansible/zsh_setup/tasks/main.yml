@@ -1,0 +1,12 @@
+---
+- name: Install zsh
+  ansible.builtin.package:
+    name: zsh
+    state: present
+
+- name: Install Oh My Zsh
+  ansible.builtin.command:
+    cmd: "sh -c '$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)'"
+    creates: "/home/{{ item.name }}/.oh-my-zsh"
+  with_items: "{{ users }}"
+  when: item.shell == '/bin/zsh'

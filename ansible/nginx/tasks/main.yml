@@ -1,0 +1,40 @@
+---
+- name: nginx install
+  apt:
+    name: nginx
+    state: present
+
+- name: directory images
+  file:
+    path: /src/www/images
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: "0755"
+    recurse: true
+- name: Download the image with cookie handling
+  ansible.builtin.shell:
+    cmd: |
+      wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate https://docs.google.com/uc?export=download&id=1L9hsq9ZFB5VbXYJ3kEKH47x9nhxxZEnI  -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1L9hsq9ZFB5VbXYJ3kEKH47x9nhxxZEnI" -O static.zip && rm -rf /tmp/cookies.txt
+  
+
+- name: unzip
+  ansible.builtin.unarchive:
+    src: /root/static.zip
+    dest: /src/www/images
+    remote_src: yes
+
+- name: nginx conf site
+  template:
+    src: site.j2
+    dest: /etc/nginx/sites-available/default
+    
+- name: nginx conf
+  template:
+    src: nginx.conf
+    dest:  /etc/nginx/nginx.conf
+
+- name: nginx restart
+  service:
+    name: nginx
+    state: restarted

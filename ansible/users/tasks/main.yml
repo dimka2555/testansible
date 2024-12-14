@@ -1,0 +1,46 @@
+---
+- name: Check SSH access as root
+  command: whoami
+  register: root_access
+  ignore_errors: yes
+
+- name: Switch to alternative user if root is unavailable
+  set_fact:
+    ansible_user: "{{ alternative_user }}"
+  when: root_access.failed
+
+- name: Switch to alternative key user if root is unavailable
+  set_fact:
+    ansible_ssh_private_key_file: "{{ atternativ_key }}"
+  when: root_access.failed
+
+- name: Manage users and groups
+  user:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    shell: "{{ item.shell }}"
+    password: "{{ item.password | default(omit) }}"
+    groups: "{{ item.groups | default(omit) }}"
+    update_password: on_create
+  with_items: "{{ users }}"
+
+- name: Create ssh user folder
+  file:
+    path: "/home/{{ item.name }}/.ssh/"
+    state: directory
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: 0700
+  with_items: "{{ users }}"
+
+- name: Set SSH public keys for users
+  copy:
+    dest: "/home/{{ item.name }}/.ssh/authorized_keys"
+    content: "{{ item.ssh_key }}"
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: 0600
+  with_items: "{{ users }}"
+  when: 
+    - item.ssh_key is defined
+    - item.state | default('present') == 'present'
